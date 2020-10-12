@@ -39,4 +39,24 @@ public abstract class BaseDatabaseMeta implements DatabaseInterface {
     public String getSQLQueryColumns(String... args) {
         return null;
     }
+
+    @Override
+    public String getMaxId(String tableName, String primaryKey) {
+        return String.format("select max(%s) from %s",primaryKey,tableName);
+    }
+
+    @Override
+    public String getSQLQueryTableSchema(String... args) {
+        return null;
+    }
+
+    @Override
+    public String getSQLQueryTables() {
+        return null;
+    }
+
+    @Override
+    public String getSQLQueryTables(String... tableSchema) {
+        return null;
+    }
 }

@@ -1,11 +1,21 @@
-![Java](https://woolson.gitee.io/npmer-badge/Java-555555-1.8-44cc11-check-ffffff-square-gradient-shadow.svg)
-![](https://img.shields.io/badge/springboot-2.1.4.RELEASE-red.svg)
+![GitHub contributors](https://img.shields.io/github/contributors/WeiYe-Jing/datax-web)
+![GitHub issues](https://img.shields.io/github/issues/WeiYe-Jing/datax-web)
+![GitHub](https://img.shields.io/github/license/WeiYe-Jing/datax-web)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/WeiYe-Jing/datax-web)
 ![](https://img.shields.io/badge/qq%E7%BE%A4-776939467-green.svg)
 
 # DataX-Web
 
-DataX阿里在开源的时候并未提供任何可视化界面，我们在使用的过程中，需要将Json配置文件放到DataX的job路径下，随着业务的增加，配置文件不方便管理和迁移并且每次执行都需要记录命令。
-目前DataX只支持单机版，多节点之间的协作不能控制，我们希望能有一款有友好的可视化界面，支持定时任务,支持分布式的数据同步利器，这也是该项目的目标。
+[![Stargazers over time](https://starchart.cc/WeiYe-Jing/datax-web.svg)](https://starchart.cc/WeiYe-Jing/datax-web)
+
+DataX Web是在DataX之上开发的分布式数据同步工具，提供简单易用的
+操作界面，降低用户使用DataX的学习成本，缩短任务配置时间，避免配置过程中出错。用户可通过页面选择数据源即可创建数据同步任务，RDBMS数据源可批量创建数据同步任务，支持实时查看数据同步进度及日志并提供终止同步功能，集成并二次开发xxl-job可根据时间、自增主键增量同步数据。
+
+任务"执行器"支持集群部署，支持执行器多节点路由策略选择，支持超时控制、失败重试、失败告警、任务依赖，执行器CPU.内存.负载的监控等等。后续还将提供更多的数据源支持、数据转换UDF、表结构同步、数据同步血缘等更为复杂的业务场景。
+
+# Architecture diagram：
+
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/DataX-Web.png)
 
 # System Requirements
 
@@ -49,25 +59,35 @@ DataX阿里在开源的时候并未提供任何可视化界面，我们在使用
 - 29、公共字段（创建时间，创建人，修改时间，修改者）插入或更新时自动填充
 - 30、对swagger接口进行token验证
 - 31、任务增加超时时间，对超时任务kill datax进程，可配合重试策略避免网络问题导致的datax卡死。
-
+- 32、添加项目管理模块，可对任务分类管理；
+- 33、对RDBMS数据源增加批量任务创建功能，选择数据源，表即可根据模板批量生成DataX同步任务；
+- 34、JSON构建增加ClickHouse数据源支持；
+- 35、执行器CPU.内存.负载的监控页面图形化；
+- 36、RDBMS数据源增量抽取增加主键自增方式并优化页面参数配置；
+- 37、更换MongoDB数据源连接方式,重构HBase数据源JSON构建模块；
+- 38、脚本类型任务增加停止功能；
+- 39、rdbms json构建增加postSql，并支持构建多个preSql，postSql；
+- 40、数据源信息加密算法修改及代码优化；
+- 41、日志页面增加DataX执行结果统计数据；
 
 # Quick Start：
 
 ##### 请点击：[Quick Start](https://github.com/WeiYe-Jing/datax-web/blob/master/userGuid.md)
+##### Linux：[一键部署](https://github.com/WeiYe-Jing/datax-web/blob/master/doc/datax-web/datax-web-deploy.md)
 
 
 # Introduction：
 
 ### 1.执行器配置(使用开源项目xxl-job)
 
-![](http://q7vnain67.bkt.clouddn.com/executor.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/executor.png)
 
 - 1、"调度中心OnLine:"右侧显示在线的"调度中心"列表, 任务执行结束后, 将会以failover的模式进行回调调度中心通知执行结果, 避免回调的单点风险;
 - 2、"执行器列表" 中显示在线的执行器列表, 可通过"OnLine 机器"查看对应执行器的集群机器;
 
 #### 执行器属性说明
 
-![](http://q7vnain67.bkt.clouddn.com/add_executor.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/add_executor.png)
 
 ```
 1、AppName: （与datax-executor中application.yml的datax.job.executor.appname保持一致）
@@ -82,13 +102,13 @@ DataX阿里在开源的时候并未提供任何可视化界面，我们在使用
 
 ### 2.创建数据源
 
-![](http://q7vnain67.bkt.clouddn.com/add_datasource.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/add_datasource.png)
 
 第四步使用
 
 ### 3.创建任务模版
 
-![](http://q7vnain67.bkt.clouddn.com/template_list.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/template_list.png)
 
 第四步使用
 
@@ -96,72 +116,83 @@ DataX阿里在开源的时候并未提供任何可视化界面，我们在使用
 
 ### 4. 构建JSON脚本
 
-- 1.步骤一，步骤二，选择第二步中创建的数据源，JSON构建目前支持的数据源有hive,mysql,oracle,postgresql,sqlserver,hbase,mongodb其它数据源的JSON构建正在开发中,暂时需要手动编写。
+- 1.步骤一，步骤二，选择第二步中创建的数据源，JSON构建目前支持的数据源有hive,mysql,oracle,postgresql,sqlserver,hbase,mongodb,clickhouse 其它数据源的JSON构建正在开发中,暂时需要手动编写。
 
-![](http://q7vnain67.bkt.clouddn.com/build.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/build.png)
 
 - 2.字段映射
 
 
-![](http://q7vnain67.bkt.clouddn.com/mapping.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/mapping.png)
 
 - 3.点击构建，生成json,此时可以选择复制json然后创建任务，选择datax任务，将json粘贴到文本框。也可以点击选择模版，直接生成任务。
 
-![](http://q7vnain67.bkt.clouddn.com/select_template.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/select_template.png)
 
+### 5.批量创建任务
 
-### 5.任务创建介绍（关联模版创建任务不再介绍，具体参考4. 构建JSON脚本）
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/batch_build_r.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/batch_build_w.png)
 
-#### DataX任务
+### 6.任务创建介绍（关联模版创建任务不再介绍，具体参考4. 构建JSON脚本）
 
-![](http://q7vnain67.bkt.clouddn.com/datax.png)
+#### 支持DataX任务,Shell任务，Python任务，PowerShell任务
 
-#### Shell任务
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/datax.png)
 
-![](http://q7vnain67.bkt.clouddn.com/shell.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/shell.png)
 
-#### Python任务
-
-![](http://q7vnain67.bkt.clouddn.com/python.png)
-
-#### PowerShell任务
-
-![](http://q7vnain67.bkt.clouddn.com/powershell.png)
-
-- 任务类型：目前支持DataX任务、Shell任务、Python任务、PowerShell任务；
 - 阻塞处理策略：调度过于密集执行器来不及处理时的处理策略；
     - 单机串行：调度请求进入单机执行器后，调度请求进入FIFO队列并以串行方式运行；
     - 丢弃后续调度：调度请求进入单机执行器后，发现执行器存在运行的调度任务，本次请求将会被丢弃并标记为失败；
     - 覆盖之前调度：调度请求进入单机执行器后，发现执行器存在运行的调度任务，将会终止运行中的调度任务并清空队列，然后运行本地调度任务；
 - 增量增新建议将阻塞策略设置为丢弃后续调度或者单机串行
     - 设置单机串行时应该注意合理设置重试次数(失败重试的次数*每次执行时间<任务的调度周期)，重试的次数如果设置的过多会导致数据重复，例如任务30秒执行一次，每次执行时间需要20秒，设置重试三次，如果任务失败了，第一个重试的时间段为1577755680-1577756680，重试任务没结束，新任务又开启，那新任务的时间段会是1577755680-1577758680
-- [增量参数设置](https://github.com/WeiYe-Jing/datax-web/blob/master/doc/datax-web/%E5%8A%A8%E6%80%81%E5%8F%82%E6%95%B0%E5%AE%8C%E6%88%90%E5%A2%9E%E9%87%8F%E6%8A%BD%E5%8F%96.md)
-- [分区参数设置](https://github.com/WeiYe-Jing/datax-web/blob/master/doc/datax-web/%E5%88%86%E5%8C%BA%E5%8A%A8%E6%80%81%E4%BC%A0%E5%8F%82%E4%BD%BF%E7%94%A8.md)
 
-### 6. 任务列表
+- [增量参数设置](https://github.com/WeiYe-Jing/datax-web/blob/master/doc/datax-web/increment-desc.md)
+- [分区参数设置](https://github.com/WeiYe-Jing/datax-web/blob/master/doc/datax-web/partition-dynamic-param.md)
 
-![](http://q7vnain67.bkt.clouddn.com/job.png)
+### 7. 任务列表
 
-### 7. 可以点击查看日志，实时获取日志信息,终止正在执行的datax进程
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/job.png)
 
-![](http://q7vnain67.bkt.clouddn.com/job_log.png)
-![](http://q7vnain67.bkt.clouddn.com/log_detail.png)
+### 8. 可以点击查看日志，实时获取日志信息,终止正在执行的datax进程
 
-### 8.任务资源监控
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/log_stat.png)
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/img/log_detail.png)
 
-![](http://q7vnain67.bkt.clouddn.com/monitor.png)
+### 9.任务资源监控
 
-### 9. admin可以创建用户，编辑用户信息
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/img/monitor.png)
 
-![](http://q7vnain67.bkt.clouddn.com/user.png)
+### 10. admin可以创建用户，编辑用户信息
 
-### 10.DataX JSON样例([样例地址](https://github.com/WeiYe-Jing/datax-web/blob/dev/doc/db/demo_job_info.sql))
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/user.png)
 
-![](http://q7vnain67.bkt.clouddn.com/json_demo.png)
 
 # UI
 
 [前端github地址](https://github.com/WeiYe-Jing/datax-web-ui)
+
+# 项目成员
+
+- water
+
+```
+非常荣幸成为datax-web的Committer，从早期datax手工编写任务+配置，到datax-web界面化勾选创建任务+配置信息+调度管理，datax-web将数据同步工作的效率提升不少，相信后面后成为etl中不可或缺的生产力……
+```
+
+- Alecor
+
+```
+非常荣幸成为datax-web的Committer，datax-web旨在帮助用户从datax配置中解放出来，提供datax的Web化的管理能力。希望datax-web能为更多有需要的人服务，带来更好的简单、易用的体验！
+```
+
+- zhouhongfa
+
+- liukunyuan
+
+感谢贡献！
 
 # Contributing
 
@@ -177,8 +208,37 @@ Copyright (c) 2020 WeiYe
 
 产品开源免费，并且将持续提供免费的社区技术支持。个人或企业内部可自由的接入和使用。
 
-> 欢迎在 [登记地址](https://github.com/WeiYe-Jing/datax-web/issues/14 ) 登记，登记仅仅为了产品推广和提升社区开发的动力。
+> 欢迎在 [登记地址](https://github.com/WeiYe-Jing/datax-web/issues/93) 登记，登记仅仅为了产品推广和提升社区开发的动力。
 
+# v-2.1.2
+
+### 新增
+
+1. 添加项目管理模块，可对任务分类管理；
+2. 对RDBMS数据源增加批量任务创建功能，选择数据源，表即可根据模板批量生成DataX同步任务；
+3. JSON构建增加ClickHouse数据源支持；
+4. 执行器CPU.内存.负载的监控页面图形化；
+5. RDBMS数据源增量抽取增加主键自增方式并优化页面参数配置；
+6. 更换MongoDB数据源连接方式,重构HBase数据源JSON构建模块；
+7. 脚本类型任务增加停止功能；
+8. rdbms json构建增加postSql，并支持构建多个preSql，postSql；
+9. 合并datax-registry模块到datax-rpc中；
+10.数据源信息加密算法修改及代码优化；
+11.时间增量同步支持更多时间格式；
+12.日志页面增加DataX执行结果统计数据；
+
+### 升级：
+
+1. PostgreSql，SQLServer，Oracle 数据源JSON构建增加schema name选择；
+2. DataX JSON中的字段名称与数据源关键词一致问题优化；
+3. 任务管理页面按钮展示优化；
+4. 日志管理页面增加任务描述信息；
+5. JSON构建前端form表单不能缓存数据问题修复;
+6. HIVE JSON构建增加头尾选项参数;
+
+### 备注：
+2.1.1版本不建议升级，数据源信息加密方式变更会导致之前已加密的数据源解密失败，任务运行失败。
+如果需要升级请重建数据源，任务。
 
 # v-2.1.1
 
@@ -204,10 +264,14 @@ Copyright (c) 2020 WeiYe
 
 1. 任务日志过大时，查看日志报错，请求超时；
 
-# 项目规划
+# 提交代码
+[参与贡献](https://github.com/WeiYe-Jing/datax-web/issues/190)
 
-![](http://q7vnain67.bkt.clouddn.com/plan.png)
 
 # Contact us
 
 ### QQ交流群 776939467
+
+![](https://datax-web.oss-cn-hangzhou.aliyuncs.com/doc/qrcode.png)
+
+
